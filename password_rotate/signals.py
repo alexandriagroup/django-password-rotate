@@ -9,10 +9,12 @@ from .util import PasswordChecker
 
 
 def redirect_to_change_password(sender, request, user, **kwargs):
-    messages.error(request, "Password must be changed.")
-    # set flag for middleware to pick up
-    request.redirect_to_password_change = True
-    print("set")
+    checker = PasswordChecker(request.user)
+    if checker.is_expired():
+        messages.error(request, "Password must be changed.")
+        # set flag for middleware to pick up
+        request.redirect_to_password_change = True
+        print("set")
 
 
 def create_user_handler(sender, instance, created, **kwargs):
