@@ -1,6 +1,8 @@
 # Django password rotation app
 This app provides configurable rotation of passwords.
 
+**NOT USABLE YET!**
+
 ## Features
  * Configurable password duration and warning duration
  * Visual warning to user using Django messages
