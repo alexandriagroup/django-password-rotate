@@ -53,22 +53,22 @@ def login_handler(sender, request, user, **kwargs):
 def register_signals():
     user_logged_in.connect(
         redirect_to_change_password,
-        dispatch_uid="password_expire:redirect_to_change_password"
+        dispatch_uid="password_rotate:redirect_to_change_password"
     )
 
     signals.post_save.connect(
         create_user_handler,
         sender=settings.AUTH_USER_MODEL,
-        dispatch_uid="password_expire:create_user_handler",
+        dispatch_uid="password_rotate:create_user_handler",
     )
 
     signals.pre_save.connect(
         change_password_handler,
         sender=settings.AUTH_USER_MODEL,
-        dispatch_uid="password_expire:change_password_handler",
+        dispatch_uid="password_rotate:change_password_handler",
     )
 
     user_logged_in.connect(
         login_handler,
-        dispatch_uid="password_expire:login_handler"
+        dispatch_uid="password_rotate:login_handler"
     )

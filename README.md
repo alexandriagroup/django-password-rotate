@@ -12,7 +12,7 @@ This Django app requires Python >= 3.6 and has been tested with Django 2.2, 3.1,
 ## Installation
  1. `pip install django-password-rotate`.
  2. Add `password_rotate` to `INSTALLED_APPS`.
- 3. Add `'password_rotate.middleware.PasswordExpireMiddleware'` to `MIDDLEWARE`.
+ 3. Add `'password_rotate.middleware.PasswordRotateMiddleware'` to `MIDDLEWARE`.
     It should be listed after authentication and session middlewares.
  4. Configure the app in your settings:
     ```python
