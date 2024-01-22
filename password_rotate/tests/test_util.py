@@ -5,8 +5,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
 
-from password_rotate.model import PasswordChange
-from password_rotate.util import PasswordChecker
+from password_rotate.models import PasswordChange
+from password_rotate.utils import PasswordChecker
 
 
 def create_user(date_joined):

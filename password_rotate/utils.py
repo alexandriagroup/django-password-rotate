@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 import humanize
 
-from .model import PasswordChange
+from .models import PasswordChange
 
 
 def request_is_ajax(request):

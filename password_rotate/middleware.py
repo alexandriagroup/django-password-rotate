@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import resolve
 
-from .util import PasswordChecker, request_is_ajax
+from .utils import PasswordChecker, request_is_ajax
 
 
 class PasswordRotateMiddleware:

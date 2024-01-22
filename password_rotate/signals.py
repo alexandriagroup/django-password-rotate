@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model, logout, user_logged_in
 from django.db.models import signals
 from django.utils import timezone
 
-from .model import PasswordChange
-from .util import PasswordChecker
+from .models import PasswordChange
+from .utils import PasswordChecker
 
 
 def redirect_to_change_password(sender, request, user, **kwargs):
