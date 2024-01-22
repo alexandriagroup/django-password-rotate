@@ -1,20 +1,11 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model, logout, user_logged_in
+from django.contrib.auth import get_user_model, user_logged_in
 from django.db.models import signals
 from django.utils import timezone
 
 from .models import PasswordChange
 from .utils import PasswordChecker
-
-
-def redirect_to_change_password(sender, request, user, **kwargs):
-    checker = PasswordChecker(request.user)
-    if checker.is_expired():
-        messages.error(request, "Password must be changed.")
-        # set flag for middleware to pick up
-        request.redirect_to_password_change = True
-        print("set")
 
 
 def create_user_handler(sender, instance, created, **kwargs):
@@ -35,29 +26,24 @@ def change_password_handler(sender, instance, **kwargs):
     except get_user_model().DoesNotExist:
         return
 
-    record, _ign = PasswordChange.objects.get_or_create(user=instance)
+    record, _ = PasswordChange.objects.get_or_create(user=instance)
     record.last_changed = timezone.now()
     record.save()
 
 
 def login_handler(sender, request, user, **kwargs):
-    # Prevents login if password expired
     checker = PasswordChecker(request.user)
     if checker.is_expired():
-        if hasattr(settings, "PASSWORD_ROTATE_CONTACT"):
-            contact = settings.PASSWORD_ROTATE_CONTACT
-        else:
-            contact = "your administrator"
-        messages.error(request, f"Password expired. Contact {contact}.")
-        logout(request)
+        # Login with expired password then redirect to change the password.
+        # This solution is faster and probably as safe as resetting the password
+        # by sending a token the user by email.
+        messages.error(request, "Password expired. You have to change your password.")
+
+        # set flag for middleware to pick up
+        request.redirect_to_password_change = True
 
 
 def register_signals():
-    user_logged_in.connect(
-        redirect_to_change_password,
-        dispatch_uid="password_rotate:redirect_to_change_password"
-    )
-
     signals.post_save.connect(
         create_user_handler,
         sender=settings.AUTH_USER_MODEL,

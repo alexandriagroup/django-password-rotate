@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.urls import resolve
+from django.urls import resolve, reverse
+from django.utils.safestring import mark_safe
 
 from .utils import PasswordChecker, request_is_ajax
 
@@ -15,17 +16,20 @@ class PasswordRotateMiddleware:
 
     def __call__(self, request):
         if self.is_page_for_warning(request):
+            password_change_path = reverse("password_change")
             # add warning if within the notification window for password expiration
             if request.user.is_authenticated:
                 checker = PasswordChecker(request.user)
+                msg = f"<a href='{password_change_path}'>Please change your password.</a> "
                 if checker.is_expired():
-                    msg = "Please change your password. It has expired."
-                    self.add_warning(request, msg)
+                    if request.path != password_change_path:
+                        msg += "It has expired."
+                        self.add_warning(request, mark_safe(msg))
                 else:
                     time_to_expire_string = checker.get_expire_time()
-                    if time_to_expire_string:
-                        msg = f"Please change your password. It expires in {time_to_expire_string}."
-                        self.add_warning(request, msg)
+                    if time_to_expire_string and request.path != password_change_path:
+                        msg += f"It expires in {time_to_expire_string}."
+                        self.add_warning(request, mark_safe(msg))
 
         response = self.get_response(request)
 
