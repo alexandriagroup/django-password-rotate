@@ -15,29 +15,37 @@ class PasswordRotateMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        request.password_status = "valid"
         if self.is_page_for_warning(request):
-            password_change_path = reverse("password_change")
+            force_password_change_path = reverse("force_password_change")
             # add warning if within the notification window for password expiration
             if request.user.is_authenticated:
                 checker = PasswordChecker(request.user)
-                msg = f"<a href='{password_change_path}'>Please change your password.</a> "
+                msg = f"<a href='{force_password_change_path}'>Please change your password.</a> "
                 if checker.is_expired():
-                    if request.path != password_change_path:
+                    if request.path != force_password_change_path:
                         msg += "It has expired."
                         self.add_warning(request, mark_safe(msg))
+                        request.password_status = "expired"
                 else:
                     time_to_expire_string = checker.get_expire_time()
-                    if time_to_expire_string and request.path != password_change_path:
+                    request.password_status = "valid"
+                    if time_to_expire_string and request.path != force_password_change_path:
                         msg += f"It expires in {time_to_expire_string}."
                         self.add_warning(request, mark_safe(msg))
 
-        response = self.get_response(request)
-
         # picks up flag for forcing password change
-        if getattr(request, "redirect_to_password_change", False):
-            return redirect("password_change")
+        if hasattr(request, "redirect_to_password_change"):
+            return redirect("force_password_change")
 
-        return response
+        # At this point, if the password expired, the user should have been redirected to force_password
+        # change and should have changed her password.
+        # If the user didn't change her password, redirect her until it's done.
+        # If the password is still valid, just return the response.
+        if request.password_status == "valid":
+            return self.get_response(request)
+        elif request.password_status == "expired":
+            return redirect("force_password_change")
 
     def is_page_for_warning(self, request):
         """
