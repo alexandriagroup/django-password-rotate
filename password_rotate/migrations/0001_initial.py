@@ -15,11 +15,28 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='PasswordChange',
+            name="PasswordChange",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_changed', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("last_changed", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("user", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        migrations.CreateModel(
+            name="PasswordHistory",
+            fields=[
+                ("id", models.BigAutoField(verbose_name="ID", serialize=False, auto_created=True, primary_key=True)),
+                ("created", models.DateTimeField(auto_now_add=True, help_text="The date the entry was created.", verbose_name="created", db_index=True)),
+                ("password", models.CharField(help_text="The encrypted password.", max_length=128, verbose_name="password")),
+                ("user", models.ForeignKey(related_name="password_history_entries", verbose_name="user", to=settings.AUTH_USER_MODEL, help_text="The user this password history entry belongs to.", on_delete=django.db.models.deletion.CASCADE)),
+            ],
+            options={
+                "ordering": ["-created"],
+                "get_latest_by": "created",
+                "verbose_name": "password history entry",
+                "verbose_name_plural": "password history entries",
+            },
+            bases=(models.Model,),
+        ),
+
     ]
