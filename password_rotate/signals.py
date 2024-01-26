@@ -38,14 +38,14 @@ def change_password_handler(sender, instance, **kwargs):
     # NOTE When changing the password, `set_password` is called 2 times: 1 time when the
     # the form in ForcePasswordChangeView is saved and another time after this view.
     # We allow only the 1st storage of the password.
-    if getattr(instance, '_has_not_previous_password'):
+    if getattr(instance, '_has_not_previous_password', False):
         PasswordHistory.objects.create(user=instance, created=now, password=instance.password)
         PasswordHistory.objects.delete_expired(instance)
         instance._has_not_previous_password = False
 
 
 def login_handler(sender, request, user, **kwargs):
-    checker = PasswordChecker(request.user)
+    checker = PasswordChecker(user)
     if checker.is_expired():
         # Login with expired password then redirect to change the password.
         # This solution is faster and probably as safe as resetting the password
