@@ -8,7 +8,7 @@ This app provides configurable rotation of passwords.
  * Forces the new password to be different from previously used passwords
 
 ## Requirements
-This Django app requires Python >= 3.6 and has been tested with Django 2.2, 3.1, 3.2 and 4.2.
+This Django app requires Python >= 3.6 and has been tested with Django 4.2.
 
 ## Installation
  1. `pip install django-password-rotate`.
