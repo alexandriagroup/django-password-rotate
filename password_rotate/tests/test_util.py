@@ -1,5 +1,5 @@
 from datetime import timedelta
-from unittest import skip
+from unittest import mock
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -10,6 +10,10 @@ from django.urls import reverse
 
 from password_rotate.models import PasswordChange, PasswordHistory
 from password_rotate.utils import PasswordChecker
+
+
+def do_nothing(*args, **kwargs):
+    pass
 
 
 def create_user(username="bob", password="password", date_joined=timezone.now()):
@@ -24,7 +28,17 @@ def create_user(username="bob", password="password", date_joined=timezone.now())
     return user
 
 
-class PasswordCheckerTests(TestCase):
+class BaseTestCase(TestCase):
+    def force_password_change(self, old, new):
+        return self.client.post(
+            reverse("force_password_change"),
+            {
+                "old_password": old, "new_password1": new, "new_password2": new,
+            }
+        )
+
+
+class PasswordCheckerTests(BaseTestCase):
     def test_rotate_with_time_to_go_using_password_change_model(self):
         user = create_user(date_joined=timezone.now())
         checker = PasswordChecker(user)
@@ -80,18 +94,10 @@ class PasswordCheckerTests(TestCase):
         self.assertFalse(checker.is_expired())
 
 
-class PasswordValidatorsTests(TestCase):
+class PasswordValidatorsTests(BaseTestCase):
     def setUp(self):
         PasswordChange.objects.all().delete()
         PasswordHistory.objects.all().delete()
-
-    def force_password_change(self, old, new):
-        return self.client.post(
-            reverse("force_password_change"),
-            {
-                "old_password": old, "new_password1": new, "new_password2": new,
-            }
-        )
 
     def test_password_never_used(self):
         """
@@ -146,6 +152,8 @@ class PasswordValidatorsTests(TestCase):
         # `password_rotate.validators.NotPreviousPasswordValidator`
         self.assertEqual(PasswordHistory.objects.filter(user=user).count(), 2)
 
+
+class PasswordHistoryCountTest(BaseTestCase):
     def test_history_count(self):
         """
         The passwords stored in `PasswordHistory` should be limited
@@ -177,3 +185,58 @@ class PasswordValidatorsTests(TestCase):
             hasher = identify_hasher(encrypted)
             # NOTE A password is verified if encrypt(raw) == encrypted
             self.assertTrue(hasher.verify(raw, encrypted))
+
+
+class ForcePasswordChangeTests(BaseTestCase):
+    @mock.patch("password_rotate.signals.messages", side_effect=do_nothing())
+    def test_redirection_while_password_not_changed(self, messages):
+        """
+        When the password expired, while the user didn't change it, she should
+        be redirected to the "force_password_change" url pattern.
+        """
+        # In our case, reverse("force_password_change") == "/password_rotate/"
+        # (cf tests/urls.py)
+
+        # ARRANGE
+        # The password expired
+        user = create_user(date_joined=timezone.now())
+        record = PasswordChange.objects.get(user=user)
+        record.last_changed = timezone.now() - timedelta(seconds=settings.PASSWORD_ROTATE_SECONDS + 1)
+        record.save()
+
+        credentials = {"username": "bob", "password": "password"}
+        self.client.login(**credentials)
+
+        # ACT
+        responses = {}
+        responses["/some_page/"] = self.client.get("/some_page/")
+        responses["/admin/"] = self.client.get("/admin/")
+        responses["/password_rotate/"] = self.client.get("/password_rotate/")
+
+        # ASSERT
+        self.assertEqual(responses["/some_page/"].status_code, 302)
+        self.assertEqual(responses["/some_page/"]["Location"], "/password_rotate/")
+        self.assertEqual(responses["/admin/"].status_code, 302)
+        self.assertEqual(responses["/admin/"]["Location"], "/password_rotate/")
+        self.assertEqual(responses["/password_rotate/"].status_code, 200)
+
+    @mock.patch("password_rotate.signals.messages", side_effect=do_nothing())
+    def test_redirection_stops_after_password_change(self, messages):
+        """
+        When the password expired, while the user didn't change it, she should
+        be redirected to the "force_password_change" url pattern.
+        """
+        # ARRANGE
+        # The password expired
+        user = create_user(date_joined=timezone.now())
+        record = PasswordChange.objects.get(user=user)
+        record.last_changed = timezone.now() - timedelta(seconds=settings.PASSWORD_ROTATE_SECONDS + 1)
+        record.save()
+        credentials = {"username": "bob", "password": "password"}
+        self.client.login(**credentials)
+
+        # ACT
+        self.force_password_change("password", "password1")
+
+        # ASSERT
+        self.assertEqual(self.client.get("/some_page/").status_code, 200)
