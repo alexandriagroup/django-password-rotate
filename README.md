@@ -24,7 +24,14 @@ This Django app requires Python >= 3.6 and has been tested with Django 4.2.
  },
  ]
  ```
- 5. Configure the app in your settings:
+ 5. Add the pattern in the urls of your project:
+ ```python
+ urlpatterns = [
+     ...
+     path("password_rotate/", include("password_rotate.urls")),
+ ]
+ ```
+ 6. Configure the app in your settings:
     ```python
     # rotate passwords after 90 days
     PASSWORD_ROTATE_SECONDS = 90 * 24 * 60 * 60
@@ -33,7 +40,7 @@ This Django app requires Python >= 3.6 and has been tested with Django 4.2.
     # keep at most the 3 previous (encrypted) passwords
     PASSWORD_ROTATE_HISTORY_COUNT = 3
     ```
- 6. Run `python manage.py migrate` to create the required database tables.
+ 7. Run `python manage.py migrate` to create the required database tables.
 
 If you want to exclude superusers from the password expiration, set this flag:
 ```python
