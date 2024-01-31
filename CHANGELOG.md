@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Miscellaneous Tasks
 
 - Test password similarity
+- Add a missing instruction for installing the app
 
 ## [0.0.4] - 2024-01-29
 

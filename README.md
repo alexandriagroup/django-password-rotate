@@ -6,6 +6,7 @@ This app provides configurable rotation of passwords.
  * Visual warning to user using Django messages
  * Prevents user from accessing any page in after expiration unless the password is changed
  * Forces the new password to be different from previously used passwords
+ * Prevents similar passwords (ex: "password1", "password2", ...)
 
 ## Requirements
 This Django app requires Python >= 3.6 and has been tested with Django 4.2.
@@ -39,6 +40,8 @@ This Django app requires Python >= 3.6 and has been tested with Django 4.2.
     PASSWORD_ROTATE_WARN_SECONDS = 10 * 24 * 60 * 60
     # keep at most the 3 previous (encrypted) passwords
     PASSWORD_ROTATE_HISTORY_COUNT = 3
+    # when changing the password, allow only a new password with similarity ratio greater than 50
+    PASSWORD_ROTATE_MAX_SIMILARITY_RATIO = 50
     ```
  7. Run `python manage.py migrate` to create the required database tables.
 
