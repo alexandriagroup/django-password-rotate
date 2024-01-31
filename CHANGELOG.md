@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.5] - 2024-01-31
+
+### Features
+
+- Add Levenshtein distance to check password similarity
+
+### Miscellaneous Tasks
+
+- Test password similarity
+
 ## [0.0.4] - 2024-01-29
 
 ### Bug Fixes
