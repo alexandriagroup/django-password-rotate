@@ -13,13 +13,14 @@ class ForcePasswordChangeForm(PasswordChangeForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        ratio = fuzz.ratio(
-            self.cleaned_data["old_password"],
-            cleaned_data["new_password1"]
-        )
-        if ratio >= settings.PASSWORD_ROTATE_MAX_SIMILARITY_RATIO:
-            raise ValidationError(
-                {"new_password1": _("The new password is too similar to the old one.")},
-                code="password_similar"
+        if cleaned_data.get("old_password") and cleaned_data.get("new_password1"):
+            ratio = fuzz.ratio(
+                cleaned_data["old_password"],
+                cleaned_data["new_password1"]
             )
+            if ratio >= settings.PASSWORD_ROTATE_MAX_SIMILARITY_RATIO:
+                raise ValidationError(
+                    {"new_password1": _("The new password is too similar to the old one.")},
+                    code="password_similar"
+                )
         return cleaned_data

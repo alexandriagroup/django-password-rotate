@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.6] - 2024-02-01
+
+### Bug Fixes
+
+- Handle properly invalid fields in `ForcePasswordChangeForm`
+
 ## [0.0.5] - 2024-01-31
 
 ### Features
