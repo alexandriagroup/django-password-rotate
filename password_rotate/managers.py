@@ -1,10 +1,5 @@
-from datetime import timedelta
-
 from django.db import models
-from django.utils import timezone
 from django.contrib.auth.hashers import identify_hasher
-from django.core.exceptions import ObjectDoesNotExist
-
 from django.conf import settings
 
 
@@ -27,26 +22,6 @@ class PasswordHistoryManager(models.Manager):
             entry = qs[offset:offset + 1].get()
             qs.filter(created__lte=entry.created).delete()
 
-    def change_required(self, user):
-        """
-        Checks if the user needs to change his/her password.
-
-        :arg object user: A :class:`~django.contrib.auth.models.User` instance.
-        :returns: ``True`` if the user needs to change his/her password, ``False`` otherwise.
-        :rtype: bool
-        """
-        newest = self.get_newest(user)
-        if newest:
-            last_change = newest.created
-        else:
-            # TODO: Do not rely on this property!
-            last_change = user.date_joined
-        d = timedelta(seconds=settings.PASSWORD_DURATION_SECONDS)
-        expiry = timezone.now() - d
-        if last_change < expiry:
-            return True
-        return False
-
     def check_password(self, user, raw_password):
         """
         Compares a raw (UNENCRYPTED!!!) password to entries in the users's
@@ -68,17 +43,3 @@ class PasswordHistoryManager(models.Manager):
                     result = False
                     break
         return result
-
-    def get_newest(self, user):
-        """
-        Gets the newest password history entry.
-
-        :arg object user: A :class:`~django.contrib.auth.models.User` instance.
-        :returns: A :class:`~password_rotate.models.PasswordHistory` instance
-          if found, ``None`` if not.
-        """
-        try:
-            entry = self.filter(user=user).latest()
-        except ObjectDoesNotExist:
-            return None
-        return entry

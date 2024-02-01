@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.7] - 2024-02-01
+
+### Miscellaneous Tasks
+
+- Improve display in the admin
+- Remove unused code in the `PasswordHistoryManager`
+
 ## [0.0.6] - 2024-02-01
 
 ### Bug Fixes
