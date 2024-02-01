@@ -5,7 +5,9 @@ from password_rotate.managers import PasswordHistoryManager
 
 
 class PasswordChange(models.Model):
-    # record when users change a password to support an expiration policy
+    """
+    Records when users change a password to support an expiration policy
+    """
     last_changed = models.DateTimeField(db_index=True, auto_now_add=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -16,8 +18,6 @@ class PasswordChange(models.Model):
 class PasswordHistory(models.Model):
     """
     Stores a single password history entry, related to :model:`auth.User`.
-
-    Has the following fields:
     """
     created = models.DateTimeField(
         auto_now_add=True, verbose_name=_("created"), db_index=True, help_text=_("The date the entry was created.")
@@ -34,6 +34,9 @@ class PasswordHistory(models.Model):
     )
 
     objects = PasswordHistoryManager()
+
+    def __str__(self):
+        return f"{self.user.username} - {self.created}"
 
     class Meta:
         get_latest_by = "created"
