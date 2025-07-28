@@ -1,0 +1,28 @@
+on: [push]
+jobs:
+  tests:
+    name: Tests dj${{ matrix.dj }} / py${{ matrix.py }}
+    runs-on: ubuntu-latest
+    strategy:
+      # all supported django version on lowest/highest supported python
+      # see https://www.djangoproject.com/download/#supported-versions
+      # and https://docs.djangoproject.com/en/stable/faq/install/#what-python-version-can-i-use-with-django
+      fail-fast: false
+      matrix:
+        include:
+          - { dj: "4.2", py: "3.8" }
+          - { dj: "4.2", py: "3.12" }
+          - { dj: "5.1", py: "3.10" }
+          - { dj: "5.1", py: "3.13" }
+          - { dj: "5.2", py: "3.10" }
+          - { dj: "5.2", py: "3.13" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.py }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.py }}
+      - run: pip install "django==${{ matrix.dj }}"
+      - run: make
