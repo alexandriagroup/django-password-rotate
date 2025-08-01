@@ -251,7 +251,7 @@ class ForcePasswordChangeTests(BaseTestCase):
 class PasswordSimilarityRatioTest(BaseTestCase):
     def test_password_with_high_similarity(self):
         """
-        When the new password is too similar too the old one, it should not be validated.
+        When the new password is too similar to the old one, it should not be validated.
         """
         # ARRANGE
         user = create_user(date_joined=timezone.now())
@@ -279,7 +279,7 @@ class PasswordSimilarityRatioTest(BaseTestCase):
 
     def test_password_with_low_similarity(self):
         """
-        When the new password is too similar too the old one, it should not be validated.
+        When the similarity of the new password is low, it should be validated.
         """
         # ARRANGE
         user = create_user(date_joined=timezone.now())
