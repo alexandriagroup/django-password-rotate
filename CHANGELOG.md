@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.8] - 2025-08-01
+
+### Bug Fixes
+
+- Added missing apps.default_auto_field configuration
+
+### Miscellaneous Tasks
+
+- Temporarily fix the installation instructions
+- Added tests to ci
+- Add a Github action to release the package on pypi
+- Fix the docstring of a test
+
 ## [0.0.7] - 2024-02-01
 
 ### Miscellaneous Tasks
