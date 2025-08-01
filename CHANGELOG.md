@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2025-08-01
+
+### Miscellaneous Tasks
+
+- [**breaking**] Use at least python 3.8
+
+## [0.0.10] - 2025-08-01
+
+### Bug Fixes
+
+- Fix the description of the pypi package
+
+## [0.0.9] - 2025-08-01
+
+### Bug Fixes
+
+- Remove invalid pypi classifiers in setup.cfg
+
 ## [0.0.8] - 2025-08-01
 
 ### Bug Fixes
@@ -14,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - Added tests to ci
 - Add a Github action to release the package on pypi
 - Fix the docstring of a test
+- Update the package
 
 ## [0.0.7] - 2024-02-01
 

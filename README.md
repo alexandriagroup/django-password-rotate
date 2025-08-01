@@ -9,10 +9,10 @@ This app provides configurable rotation of passwords.
  * Prevents similar passwords (ex: "password1", "password2", ...)
 
 ## Requirements
-This Django app requires Python >= 3.6 and has been tested with Django 4.2.
+This Django app requires Python >= 3.8 and has been tested with Django 4.2, 5.1 and 5.2.
 
 ## Installation
- 1. `pip install https://github.com/alexandriagroup/django-password-rotate/archive/refs/heads/main.zip`.
+ 1. `pip install django-password-rotate`.
  2. Add `password_rotate` to `INSTALLED_APPS`.
  3. Add `'password_rotate.middleware.PasswordRotateMiddleware'` to `MIDDLEWARE`.
     It should be listed after authentication and session middlewares.
