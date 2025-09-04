@@ -4,12 +4,15 @@ from unittest import mock
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import identify_hasher
+from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
 from password_rotate.models import PasswordChange, PasswordHistory
 from password_rotate.utils import PasswordChecker
+
+from .utils import mock_password_input, MockTTY
 
 
 def do_nothing(*args, **kwargs):
@@ -305,3 +308,17 @@ class PasswordSimilarityRatioTest(BaseTestCase):
 
         # There should be 2 rows
         self.assertEqual(PasswordHistory.objects.filter(user=user).count(), 2)
+
+
+class RegressionTestCase(TestCase):
+    @mock_password_input()
+    def test_createsuperuser_regression_dj50(self):
+        # note: mocktty and mock_password_input was copied from django's test suite
+        call_command(
+            "createsuperuser",
+            "--username",
+            "super",
+            "--email",
+            "root@example.com",
+            stdin=MockTTY(),
+        )
