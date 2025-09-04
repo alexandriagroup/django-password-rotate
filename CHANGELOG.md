@@ -2,12 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2025-09-04
+
+### Miscellaneous Tasks
+
+- Also run ci on pull requests (@olivierdalang)
+
+### Bug Fixes
+
+- dj<=5.1 compatibility (@olivierdalang)
+- fix for createsuperuser crashing on django>=5.0 (@olivierdalang)
+
 ## [1.0.1] - 2025-08-01
 
 ### Bug Fixes
 
 - Downgrade humanize package
 - Downgrade rapidfuzz package
+
+### Miscellaneous Tasks
+
+- Bump to v1.0.1
 
 ## [1.0.0] - 2025-08-01
 
